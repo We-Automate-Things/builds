@@ -131,20 +131,28 @@ function killScraperViaPid(modelId, chatsite) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var port;
+        var port, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     logHelper.consoleLog("INITIATING SCRAPER LAUNCHER");
                     port = parseInt(process.env.HOST_PORT, 10);
-                    return [4 /*yield*/, amqp.connect("amqp://".concat(process.env.HOST), { localPort: port })];
+                    _a.label = 1;
                 case 1:
-                    connection = _a.sent();
-                    return [4 /*yield*/, connection.createChannel()];
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, amqp.connect("amqp://".concat(process.env.HOST), { localPort: port })];
                 case 2:
+                    connection = _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _a.sent();
+                    console.log(e_1);
+                    return [3 /*break*/, 4];
+                case 4: return [4 /*yield*/, connection.createChannel()];
+                case 5:
                     channel = _a.sent();
                     return [4 /*yield*/, channel.assertQueue(queue)];
-                case 3:
+                case 6:
                     _a.sent();
                     setInterval(function () {
                         logHelper.consoleLog("WAITING FOR MESSAGES", states_1.States.PACKAGE);
