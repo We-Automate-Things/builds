@@ -131,16 +131,18 @@ function killScraperViaPid(modelId, chatsite) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var port, e_1;
+        var port, host, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     logHelper.consoleLog("INITIATING SCRAPER LAUNCHER");
                     port = parseInt(process.env.HOST_PORT, 10);
+                    host = "amqp://".concat(process.env.HOST);
+                    console.log(port, host);
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, amqp.connect("amqp://".concat(process.env.HOST), { localPort: port })];
+                    return [4 /*yield*/, amqp.connect(host, { localPort: port })];
                 case 2:
                     connection = _a.sent();
                     return [3 /*break*/, 4];
