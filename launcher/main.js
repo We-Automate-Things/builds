@@ -64,12 +64,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var amqp = __importStar(require("amqplib"));
 var child_process_1 = require("child_process");
-var dotenv_1 = __importDefault(require("dotenv"));
 var os_1 = __importDefault(require("os"));
 var tasks_1 = require("./enums/tasks");
 var states_1 = require("./enums/states");
 var log_helper_1 = require("./log-helper");
-dotenv_1.default.config();
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require("dotenv").config({ path: "".concat(__dirname, "/.env") });
 var logHelper = new log_helper_1.LogHelper();
 var queue = "MANAGE_SCRAPERS";
 var scrapers = [];
@@ -131,30 +131,20 @@ function killScraperViaPid(modelId, chatsite) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var port, host, e_1;
+        var host;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     logHelper.consoleLog("INITIATING SCRAPER LAUNCHER");
-                    port = parseInt(process.env.HOST_PORT, 10);
                     host = "amqp://".concat(process.env.HOST);
-                    console.log(port, host);
-                    _a.label = 1;
+                    return [4 /*yield*/, amqp.connect(host)];
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, amqp.connect(host, { localPort: port })];
-                case 2:
                     connection = _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    e_1 = _a.sent();
-                    console.log(e_1);
-                    return [3 /*break*/, 4];
-                case 4: return [4 /*yield*/, connection.createChannel()];
-                case 5:
+                    return [4 /*yield*/, connection.createChannel()];
+                case 2:
                     channel = _a.sent();
                     return [4 /*yield*/, channel.assertQueue(queue)];
-                case 6:
+                case 3:
                     _a.sent();
                     setInterval(function () {
                         logHelper.consoleLog("WAITING FOR MESSAGES", states_1.States.PACKAGE);
