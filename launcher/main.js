@@ -64,12 +64,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var amqp = __importStar(require("amqplib"));
 var child_process_1 = require("child_process");
+var dotenv_1 = __importDefault(require("dotenv"));
 var os_1 = __importDefault(require("os"));
 var tasks_1 = require("./enums/tasks");
 var states_1 = require("./enums/states");
 var log_helper_1 = require("./log-helper");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require("dotenv").config({ path: "".concat(__dirname, "/.env") });
+dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
 var logHelper = new log_helper_1.LogHelper();
 var queue = "MANAGE_SCRAPERS";
 var scrapers = [];
@@ -131,13 +131,11 @@ function killScraperViaPid(modelId, chatsite) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var host;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     logHelper.consoleLog("INITIATING SCRAPER LAUNCHER");
-                    host = "amqp://".concat(process.env.HOST);
-                    return [4 /*yield*/, amqp.connect(host)];
+                    return [4 /*yield*/, amqp.connect("amqp://".concat(process.env.HOST))];
                 case 1:
                     connection = _a.sent();
                     return [4 /*yield*/, connection.createChannel()];
@@ -158,7 +156,13 @@ function main() {
                             switch (job) {
                                 case tasks_1.Tasks.ACTIVATE_SCRAPER: {
                                     var token = "".concat(json.data.modelId, " ").concat(json.data.chatSiteId);
-                                    var command = "ts-node ".concat(process.env.PATH_TO_CLIENT, " -p ").concat(token);
+                                    var command = "";
+                                    if (process.env.IS_PRODUCTION === "TRUE") {
+                                        command = "".concat(process.env.START_COMMAND, " -p ").concat(token, " --name ").concat(token);
+                                    }
+                                    else {
+                                        command = "".concat(process.env.START_COMMAND, " -p ").concat(token);
+                                    }
                                     var model = json.data.modelId;
                                     var site = json.data.chatSiteId;
                                     executeInNewTerminal(command, model, site);
