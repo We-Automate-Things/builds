@@ -95,7 +95,7 @@ var ContentInfoService = /** @class */ (function (_super) {
                             model_id: modelId,
                             chatsite_id: chatsiteId,
                         };
-                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/retrieve-content/"), json, this.httpOptions)];
+                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/retrieve-content"), json, this.httpOptions)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];
@@ -113,7 +113,7 @@ var ContentInfoService = /** @class */ (function (_super) {
                             model_id: modelId,
                             chatsite_id: chatsiteId
                         };
-                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/content-to-be-sent/"), json, this.httpOptions)];
+                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/content-to-be-sent"), json, this.httpOptions)];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/, response.data];

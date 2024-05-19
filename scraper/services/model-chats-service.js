@@ -79,7 +79,7 @@ var ModelChatsService = /** @class */ (function (_super) {
                             "model_id": modelId,
                             "chatsite_id": chatsiteId
                         };
-                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/chats/"), json, this.httpOptions)];
+                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/chats"), json, this.httpOptions)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -99,7 +99,7 @@ var ModelChatsService = /** @class */ (function (_super) {
                             "model_id": modelId,
                             "chatsite_id": chatsiteId
                         };
-                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/send-chats-per-client/"), json, this.httpOptions)];
+                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/send-chats-per-client"), json, this.httpOptions)];
                     case 1:
                         response = _a.sent();
                         messageArray = [];
@@ -127,7 +127,7 @@ var ModelChatsService = /** @class */ (function (_super) {
                             "model_id": modelId,
                             "chatsite_id": chatsiteId
                         };
-                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/chats-to-be-send/"), json, this.httpOptions)];
+                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/chats-to-be-send"), json, this.httpOptions)];
                     case 1:
                         response = _a.sent();
                         unprocessedMessages = [];
