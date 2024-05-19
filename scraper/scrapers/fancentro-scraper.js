@@ -727,15 +727,14 @@ var FancentroScraper = /** @class */ (function (_super) {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 5, , 6]);
+                        _a.trys.push([0, 4, , 5]);
                         return [4 /*yield*/, this.pageTwo.waitForSelector("#transaction-list", { timeout: 5000 })];
-                    case 1: return [4 /*yield*/, (_a.sent())];
-                    case 2:
-                        _a.sent();
+                    case 1:
+                        (_a.sent());
                         return [4 /*yield*/, this.pageTwo.$$eval("#main-container table thead tr td", function (tds) {
                                 return tds.map(function (td) { return td.textContent.trim(); });
                             })];
-                    case 3:
+                    case 2:
                         headers = _a.sent();
                         return [4 /*yield*/, this.pageTwo.$$eval("#transaction-list tr", function (rows, headers) {
                                 return rows.map(function (tr) {
@@ -762,13 +761,13 @@ var FancentroScraper = /** @class */ (function (_super) {
                                     return rowData;
                                 });
                             }, headers)];
-                    case 4:
+                    case 3:
                         tableData = _a.sent();
                         return [2 /*return*/, tableData];
-                    case 5:
+                    case 4:
                         e_1 = _a.sent();
                         return [2 /*return*/, []];
-                    case 6: return [2 /*return*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -784,22 +783,24 @@ var FancentroScraper = /** @class */ (function (_super) {
                     case 1:
                         _a.pageTwo = _b.sent();
                         this.consoleLog("RETRIEVING ALL NEW EARNINGS");
-                        this.pageTwo.goto("https://fancentro.com/admin/transactions");
-                        return [4 /*yield*/, this.fetchEarningsData()];
+                        return [4 /*yield*/, this.pageTwo.goto("https://fancentro.com/admin/transactions")];
                     case 2:
+                        _b.sent();
+                        return [4 /*yield*/, this.fetchEarningsData()];
+                    case 3:
                         tableData = _b.sent();
-                        if (!(this.previousSalesCount < tableData.length && tableData.length !== 0)) return [3 /*break*/, 4];
+                        if (!(this.previousSalesCount < tableData.length && tableData.length !== 0)) return [3 /*break*/, 5];
                         this.previousSalesCount = tableData.length;
                         this.consoleLog("SEND NEW SALES TO API");
                         return [4 /*yield*/, this.salesService.postTableDataToValidate(tableData, this.chatsiteId, this.modelId)];
-                    case 3:
-                        _b.sent();
-                        return [3 /*break*/, 5];
                     case 4:
+                        _b.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
                         this.consoleLog("NO NEW SALES DETECTED", states_1.States.WARNING);
-                        _b.label = 5;
-                    case 5: return [4 /*yield*/, this.pageTwo.close()];
-                    case 6:
+                        _b.label = 6;
+                    case 6: return [4 /*yield*/, this.pageTwo.close()];
+                    case 7:
                         _b.sent();
                         return [2 /*return*/];
                 }
