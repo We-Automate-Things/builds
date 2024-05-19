@@ -53,8 +53,17 @@ var model_credential_service_1 = require("./services/model-credential-service");
 var path_1 = __importDefault(require("path"));
 var fs_1 = __importDefault(require("fs"));
 console.log("INITIATE SCRAPER");
-var modelId = parseInt(process.argv[3], 10);
-var chatsiteName = process.argv[4];
+dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
+var modelId = null;
+var chatsiteName = null;
+if (process.env.PM2 === "false") {
+    modelId = parseInt(process.argv[3], 10);
+    chatsiteName = process.argv[4];
+}
+else {
+    modelId = parseInt(process.argv[2], 10);
+    chatsiteName = process.argv[3];
+}
 if (!modelId) {
     throw new InitiateError_1.InitiateError(exceptionStringEnums_1.ExceptionStringEnums.initiateInvalidParameterModelId);
 }
@@ -74,7 +83,6 @@ process.on('uncaughtException', function (err) {
     fs_1.default.appendFileSync(logFilePath, logMessage);
 });
 console.log("RECEIVED ALL NEEDED PARAMETERS");
-dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
 playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_recaptcha_1.default)({ provider: { id: "2captcha", token: process.env.CAPTCHA_KEY }, visualFeedback: true, throwOnError: true }));
 playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_stealth_1.default)());
 (function () { return __awaiter(void 0, void 0, void 0, function () {
