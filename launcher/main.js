@@ -102,7 +102,7 @@ function executeInPM2(model, site) {
         }
         // Start the secondary application
         pm2_1.default.start({
-            script: "/var/apps/scraper", // Path to the secondary app script
+            script: "/var/apps/scraper/main.js", // Path to the secondary app script
             name: "".concat(model, "-").concat(site, "-SCRAPER"), // Name of the secondary app
             exec_mode: "fork", // Or 'cluster' if needed
             // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
