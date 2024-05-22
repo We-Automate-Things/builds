@@ -132,7 +132,7 @@ function killScraper(modelId, chatsite) {
             switch (_a.label) {
                 case 0:
                     logHelper.consoleLog("SHUTTING DOWN 'SCRAPER ".concat(modelId, " - ").concat(chatsite, "'"), states_1.States.WARNING);
-                    scraperIndex = scrapers.findIndex(function (value) { return (value.model === modelId) && (value.chatsite === chatsite); });
+                    scraperIndex = this.scrapers.findIndex(function (value) { return (value.model === modelId) && (value.chatsite === chatsite); });
                     if (!(scraperIndex !== -1)) return [3 /*break*/, 2];
                     scraper = scrapers[scraperIndex];
                     if (scraper.platform === "win32") {
@@ -176,10 +176,10 @@ function killScraper(modelId, chatsite) {
                             });
                         });
                     }
-                    return [4 /*yield*/, channel.deleteQueue("SCRAPER-".concat(modelId, "-").concat(chatsite))];
+                    return [4 /*yield*/, this.channel.deleteQueue("SCRAPER-".concat(modelId, "-").concat(chatsite))];
                 case 1:
                     _a.sent();
-                    this.consoleLog("QUEUE SCRAPER-".concat(modelId, "-").concat(chatsite, " DELETED."), states_1.States.WARNING);
+                    logHelper.consoleLog("QUEUE SCRAPER-".concat(modelId, "-").concat(chatsite, " DELETED."), states_1.States.WARNING);
                     scrapers.splice(scraperIndex, 1);
                     return [3 /*break*/, 3];
                 case 2:
@@ -192,19 +192,23 @@ function killScraper(modelId, chatsite) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _a, _b;
+        var _this = this;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     logHelper.consoleLog("INITIATING SCRAPER LAUNCHER");
+                    _a = this;
                     return [4 /*yield*/, amqp.connect("amqp://".concat(process.env.HOST))];
                 case 1:
-                    connection = _a.sent();
+                    _a.connection = _c.sent();
+                    _b = this;
                     return [4 /*yield*/, connection.createChannel()];
                 case 2:
-                    channel = _a.sent();
-                    return [4 /*yield*/, channel.assertQueue(queue)];
+                    _b.channel = _c.sent();
+                    return [4 /*yield*/, this.channel.assertQueue(queue)];
                 case 3:
-                    _a.sent();
+                    _c.sent();
                     setInterval(function () {
                         logHelper.consoleLog("WAITING FOR MESSAGES", states_1.States.PACKAGE);
                     }, 1000 * 60);
@@ -213,7 +217,7 @@ function main() {
                             var json = JSON.parse(msg.content.toString());
                             var job = json.job;
                             logHelper.consoleLog("CONSUMED MESSAGE: ".concat(job), states_1.States.PACKAGE);
-                            channel.ack(msg);
+                            _this.channel.ack(msg);
                             switch (job) {
                                 case tasks_1.Tasks.ACTIVATE_SCRAPER: {
                                     var token = "".concat(json.data.modelId, " ").concat(json.data.chatSiteId);
