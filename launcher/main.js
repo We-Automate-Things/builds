@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -62,195 +39,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var amqp = __importStar(require("amqplib"));
-var child_process_1 = require("child_process");
 var dotenv_1 = __importDefault(require("dotenv"));
-var os_1 = __importDefault(require("os"));
-var pm2_1 = __importDefault(require("pm2"));
-var tasks_1 = require("./enums/tasks");
-var states_1 = require("./enums/states");
-var log_helper_1 = require("./log-helper");
+var local_runner_1 = require("./runners/local-runner");
+var production_runner_1 = require("./runners/production-runner");
 dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
-var logHelper = new log_helper_1.LogHelper();
-var queue = "MANAGE_SCRAPERS";
-var scrapers = [];
-var connection;
-var channel;
-function executeInNewTerminalWindows(command, model, site) {
-    logHelper.consoleLog("STARTING 'SCRAPER FOR ".concat(model, " - ").concat(site, "'"), states_1.States.SUCCESS);
-    var cmd = "cmd.exe";
-    var args = ["/c", command];
-    var cwd = "".concat(process.cwd(), "/../chat-scraper"); // Adjust the cwd as needed
-    var cmdProcess = (0, child_process_1.spawn)(cmd, args, {
-        detached: true,
-        cwd: cwd,
-        stdio: "ignore" // Redirects all stdio to /dev/null or NUL
-    });
-    scrapers.push({
-        model: model,
-        chatsite: site,
-        pid: cmdProcess.pid,
-        platform: os_1.default.platform(),
-    });
-}
-function executeInPM2(model, site) {
-    // Connect to the PM2 daemon
-    pm2_1.default.connect(function (err) {
-        if (err) {
-            logHelper.consoleLog("Error connecting to PM2: ".concat(err), states_1.States.ERROR);
-            process.exit(2);
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, productionRunner, localRunner;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = process.env.IS_PRODUCTION;
+                switch (_a) {
+                    case "TRUE": return [3 /*break*/, 1];
+                    case "FALSE": return [3 /*break*/, 3];
+                }
+                return [3 /*break*/, 5];
+            case 1:
+                productionRunner = new production_runner_1.ProductionRunner();
+                return [4 /*yield*/, productionRunner.initiateLauncher()];
+            case 2:
+                _b.sent();
+                return [3 /*break*/, 6];
+            case 3:
+                localRunner = new local_runner_1.LocalRunner();
+                return [4 /*yield*/, localRunner.initiateLauncher()];
+            case 4:
+                _b.sent();
+                return [3 /*break*/, 6];
+            case 5:
+                {
+                    //
+                }
+                _b.label = 6;
+            case 6: return [2 /*return*/];
         }
-        // Start the secondary application
-        pm2_1.default.start({
-            script: "/var/apps/scraper/main.js", // Path to the secondary app script
-            name: "SCRAPER-".concat(model, "-").concat(site), // Name of the secondary app
-            exec_mode: "fork", // Or 'cluster' if needed
-            // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
-            args: [model, site] // Arguments passed to the script
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-        }, function (err) {
-            scrapers.push({
-                model: model,
-                chatsite: site,
-                pid: null,
-                platform: os_1.default.platform(),
-            });
-            if (err) {
-                logHelper.consoleLog("Error starting application: ".concat(err), states_1.States.ERROR);
-                pm2_1.default.disconnect(); // Disconnects from PM2
-                process.exit(2);
-            }
-            logHelper.consoleLog("SCRAPER SUCCESSFULLY STARTED ".concat(model, " - ").concat(site, " "), states_1.States.SUCCESS);
-            pm2_1.default.disconnect(); // Disconnects from PM2
-        });
     });
-}
-function killScraper(modelId, chatsite) {
-    return __awaiter(this, void 0, void 0, function () {
-        var scraperIndex, scraper, processName_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    logHelper.consoleLog("SHUTTING DOWN 'SCRAPER ".concat(modelId, " - ").concat(chatsite, "'"), states_1.States.WARNING);
-                    scraperIndex = this.scrapers.findIndex(function (value) { return (value.model === modelId) && (value.chatsite === chatsite); });
-                    if (!(scraperIndex !== -1)) return [3 /*break*/, 2];
-                    scraper = scrapers[scraperIndex];
-                    if (scraper.platform === "win32") {
-                        // For Windows, use taskkill command
-                        (0, child_process_1.spawn)("taskkill", ["/pid", scraper.pid.toString(), "/f", "/t"]);
-                        logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN"), states_1.States.SUCCESS);
-                    }
-                    else {
-                        logHelper.consoleLog("TRYING TO KILL ".concat(modelId, " - ").concat(chatsite), states_1.States.WARNING);
-                        processName_1 = "SCRAPER-".concat(modelId, "-").concat(chatsite);
-                        // Connect to the PM2 daemon
-                        pm2_1.default.connect(function (err) {
-                            if (err) {
-                                console.error("Error connecting to PM2:", err);
-                                process.exit(2);
-                            }
-                            // eslint-disable-next-line @typescript-eslint/no-shadow
-                            pm2_1.default.list(function (err, list) {
-                                if (err) {
-                                    console.error("Error listing PM2 processes:", err);
-                                    pm2_1.default.disconnect();
-                                    process.exit(2);
-                                }
-                                var processInfo = list.find(function (process) { return process.name === processName_1; });
-                                if (!processInfo) {
-                                    console.error("Process '".concat(processName_1, "' not found."));
-                                    pm2_1.default.disconnect();
-                                    process.exit(1);
-                                }
-                                var pmId = processInfo.pm_id;
-                                // eslint-disable-next-line @typescript-eslint/no-shadow
-                                pm2_1.default.delete(pmId, function (err) {
-                                    if (err) {
-                                        console.error("Error killing process '".concat(processName_1, "':"), err);
-                                        pm2_1.default.disconnect();
-                                        process.exit(2);
-                                    }
-                                    logHelper.consoleLog("PROCESS '".concat(processName_1, "' STOPPED SUCCESSFULLY."), states_1.States.SUCCESS);
-                                    pm2_1.default.disconnect();
-                                });
-                            });
-                        });
-                    }
-                    return [4 /*yield*/, this.channel.deleteQueue("SCRAPER-".concat(modelId, "-").concat(chatsite))];
-                case 1:
-                    _a.sent();
-                    logHelper.consoleLog("QUEUE SCRAPER-".concat(modelId, "-").concat(chatsite, " DELETED."), states_1.States.WARNING);
-                    scrapers.splice(scraperIndex, 1);
-                    return [3 /*break*/, 3];
-                case 2:
-                    logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " not found"), states_1.States.ERROR);
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        var _a, _b;
-        var _this = this;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    logHelper.consoleLog("INITIATING SCRAPER LAUNCHER");
-                    _a = this;
-                    return [4 /*yield*/, amqp.connect("amqp://".concat(process.env.HOST))];
-                case 1:
-                    _a.connection = _c.sent();
-                    _b = this;
-                    return [4 /*yield*/, connection.createChannel()];
-                case 2:
-                    _b.channel = _c.sent();
-                    return [4 /*yield*/, this.channel.assertQueue(queue)];
-                case 3:
-                    _c.sent();
-                    setInterval(function () {
-                        logHelper.consoleLog("WAITING FOR MESSAGES", states_1.States.PACKAGE);
-                    }, 1000 * 60);
-                    channel.consume(queue, function (msg) {
-                        if (msg !== null) {
-                            var json = JSON.parse(msg.content.toString());
-                            var job = json.job;
-                            logHelper.consoleLog("CONSUMED MESSAGE: ".concat(job), states_1.States.PACKAGE);
-                            _this.channel.ack(msg);
-                            switch (job) {
-                                case tasks_1.Tasks.ACTIVATE_SCRAPER: {
-                                    var token = "".concat(json.data.modelId, " ").concat(json.data.chatSiteId);
-                                    var model = json.data.modelId;
-                                    var site = json.data.chatSiteId;
-                                    var command = "";
-                                    if (process.env.IS_PRODUCTION === "TRUE") {
-                                        executeInPM2(model, site);
-                                    }
-                                    else {
-                                        command = "".concat(process.env.START_COMMAND, " -p ").concat(token);
-                                        executeInNewTerminalWindows(command, model, site);
-                                    }
-                                    break;
-                                }
-                                case tasks_1.Tasks.KILL_SCRAPER: {
-                                    var model = json.data.modelId;
-                                    var site = json.data.chatSiteId;
-                                    killScraper(model, site);
-                                    break;
-                                }
-                                default: {
-                                    logHelper.consoleLog("INVALID TASK TYPE RECEIVED: ".concat(job), states_1.States.ERROR);
-                                }
-                            }
-                        }
-                    });
-                    logHelper.consoleLog("AWAITING MESSAGES IN QUEUE", states_1.States.PACKAGE);
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-main().catch(function (error) {
-    logHelper.consoleLog("Error in main function: ".concat(error), states_1.States.ERROR);
-});
+}); })();
