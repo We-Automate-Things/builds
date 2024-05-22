@@ -108,13 +108,13 @@ function executeInPM2(model, site) {
             // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
             args: [model, site] // Arguments passed to the script
             // eslint-disable-next-line @typescript-eslint/no-shadow
-        }, function (err, apps) {
+        }, function (err) {
             if (err) {
                 logHelper.consoleLog("Error starting application: ".concat(err), states_1.States.ERROR);
                 pm2_1.default.disconnect(); // Disconnects from PM2
                 process.exit(2);
             }
-            logHelper.consoleLog("Application started successfully: ".concat(apps));
+            logHelper.consoleLog("SCRAPER SUCCESSFULLY STARTED ".concat(model, " - ").concat(site, " "), states_1.States.SUCCESS);
             pm2_1.default.disconnect(); // Disconnects from PM2
         });
     });
