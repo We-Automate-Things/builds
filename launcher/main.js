@@ -100,6 +100,7 @@ function executeInPM2(model, site) {
             logHelper.consoleLog("Error connecting to PM2: ".concat(err), states_1.States.ERROR);
             process.exit(2);
         }
+        var pm2ID;
         // Start the secondary application
         pm2_1.default.start({
             script: "/var/apps/scraper/main.js", // Path to the secondary app script
@@ -108,7 +109,13 @@ function executeInPM2(model, site) {
             // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
             args: [model, site] // Arguments passed to the script
             // eslint-disable-next-line @typescript-eslint/no-shadow
-        }, function (err) {
+        }, function (err, app) {
+            scrapers.push({
+                model: model,
+                chatsite: site,
+                pid: app.pm_id,
+                platform: os_1.default.platform(),
+            });
             if (err) {
                 logHelper.consoleLog("Error starting application: ".concat(err), states_1.States.ERROR);
                 pm2_1.default.disconnect(); // Disconnects from PM2
@@ -118,27 +125,22 @@ function executeInPM2(model, site) {
             pm2_1.default.disconnect(); // Disconnects from PM2
         });
     });
-    scrapers.push({
-        model: model,
-        chatsite: site,
-        pid: null,
-        platform: os_1.default.platform(),
-    });
 }
 function killScraper(modelId, chatsite) {
     return __awaiter(this, void 0, void 0, function () {
-        var scraperIndex, scraper;
+        var scraperIndex, scraper_1;
         return __generator(this, function (_a) {
             logHelper.consoleLog("SHUTTING DOWN 'SCRAPER ".concat(modelId, " - ").concat(chatsite, "'"), states_1.States.WARNING);
             scraperIndex = scrapers.findIndex(function (value) { return (value.model === modelId) && (value.chatsite === chatsite); });
             if (scraperIndex !== -1) {
-                scraper = scrapers[scraperIndex];
-                if (scraper.platform === "win32") {
+                scraper_1 = scrapers[scraperIndex];
+                if (scraper_1.platform === "win32") {
                     // For Windows, use taskkill command
-                    (0, child_process_1.spawn)("taskkill", ["/pid", scraper.pid.toString(), "/f", "/t"]);
+                    (0, child_process_1.spawn)("taskkill", ["/pid", scraper_1.pid.toString(), "/f", "/t"]);
                     logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN"), states_1.States.SUCCESS);
                 }
                 else {
+                    logHelper.consoleLog("TRYING TO KILL ".concat(modelId, " - ").concat(chatsite), states_1.States.PACKAGE);
                     // Connect to the PM2 daemon
                     pm2_1.default.connect(function (err) {
                         if (err) {
@@ -147,13 +149,13 @@ function killScraper(modelId, chatsite) {
                         }
                         // Stop the application by name or id
                         // eslint-disable-next-line @typescript-eslint/no-shadow
-                        pm2_1.default.stop("".concat(modelId, "-").concat(chatsite, "-SCRAPER"), function (err, proc) {
+                        pm2_1.default.stop(scraper_1.pid, function (err) {
                             if (err) {
                                 console.error("Error stopping application:", err);
                                 pm2_1.default.disconnect(); // Disconnects from PM2
                                 process.exit(2);
                             }
-                            logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN\n ").concat(proc), states_1.States.SUCCESS);
+                            logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN\n"), states_1.States.SUCCESS);
                             pm2_1.default.disconnect(); // Disconnects from PM2
                         });
                     });

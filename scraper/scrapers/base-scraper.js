@@ -149,14 +149,8 @@ var baseScraper = /** @class */ (function () {
                         exchange = 'default';
                         this.queue = 'SCRAPER_' + this.modelId + '_' + this.chatsiteId;
                         this.routingKey = 'SCRAPER_' + this.modelId + '_' + this.chatsiteId;
-                        return [4 /*yield*/, this.channel.assertExchange(exchange, 'direct', { durable: true })];
+                        return [4 /*yield*/, this.channel.assertQueue(this.queue)];
                     case 3:
-                        _c.sent();
-                        return [4 /*yield*/, this.channel.assertQueue(this.queue, { durable: true })];
-                    case 4:
-                        _c.sent();
-                        return [4 /*yield*/, this.channel.bindQueue(this.queue, exchange, this.routingKey)];
-                    case 5:
                         _c.sent();
                         this.channel.consume(this.queue, function (msg) {
                             if (msg !== null) {
