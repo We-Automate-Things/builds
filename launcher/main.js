@@ -100,11 +100,10 @@ function executeInPM2(model, site) {
             logHelper.consoleLog("Error connecting to PM2: ".concat(err), states_1.States.ERROR);
             process.exit(2);
         }
-        var pm2ID;
         // Start the secondary application
         pm2_1.default.start({
             script: "/var/apps/scraper/main.js", // Path to the secondary app script
-            name: "".concat(model, "-").concat(site, "-SCRAPER"), // Name of the secondary app
+            name: "SCRAPER-".concat(model, "-").concat(site), // Name of the secondary app
             exec_mode: "fork", // Or 'cluster' if needed
             // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
             args: [model, site] // Arguments passed to the script
@@ -130,57 +129,64 @@ function killScraper(modelId, chatsite) {
     return __awaiter(this, void 0, void 0, function () {
         var scraperIndex, scraper, processName_1;
         return __generator(this, function (_a) {
-            logHelper.consoleLog("SHUTTING DOWN 'SCRAPER ".concat(modelId, " - ").concat(chatsite, "'"), states_1.States.WARNING);
-            scraperIndex = scrapers.findIndex(function (value) { return (value.model === modelId) && (value.chatsite === chatsite); });
-            if (scraperIndex !== -1) {
-                scraper = scrapers[scraperIndex];
-                if (scraper.platform === "win32") {
-                    // For Windows, use taskkill command
-                    (0, child_process_1.spawn)("taskkill", ["/pid", scraper.pid.toString(), "/f", "/t"]);
-                    logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN"), states_1.States.SUCCESS);
-                }
-                else {
-                    logHelper.consoleLog("TRYING TO KILL ".concat(modelId, " - ").concat(chatsite), states_1.States.WARNING);
-                    processName_1 = "".concat(modelId, "-").concat(chatsite, "-SCRAPER");
-                    // Connect to the PM2 daemon
-                    pm2_1.default.connect(function (err) {
-                        if (err) {
-                            console.error("Error connecting to PM2:", err);
-                            process.exit(2);
-                        }
-                        // eslint-disable-next-line @typescript-eslint/no-shadow
-                        pm2_1.default.list(function (err, list) {
+            switch (_a.label) {
+                case 0:
+                    logHelper.consoleLog("SHUTTING DOWN 'SCRAPER ".concat(modelId, " - ").concat(chatsite, "'"), states_1.States.WARNING);
+                    scraperIndex = scrapers.findIndex(function (value) { return (value.model === modelId) && (value.chatsite === chatsite); });
+                    if (!(scraperIndex !== -1)) return [3 /*break*/, 2];
+                    scraper = scrapers[scraperIndex];
+                    if (scraper.platform === "win32") {
+                        // For Windows, use taskkill command
+                        (0, child_process_1.spawn)("taskkill", ["/pid", scraper.pid.toString(), "/f", "/t"]);
+                        logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN"), states_1.States.SUCCESS);
+                    }
+                    else {
+                        logHelper.consoleLog("TRYING TO KILL ".concat(modelId, " - ").concat(chatsite), states_1.States.WARNING);
+                        processName_1 = "SCRAPER-".concat(modelId, "-").concat(chatsite);
+                        // Connect to the PM2 daemon
+                        pm2_1.default.connect(function (err) {
                             if (err) {
-                                console.error("Error listing PM2 processes:", err);
-                                pm2_1.default.disconnect();
+                                console.error("Error connecting to PM2:", err);
                                 process.exit(2);
                             }
-                            var processInfo = list.find(function (process) { return process.name === processName_1; });
-                            if (!processInfo) {
-                                console.error("Process '".concat(processName_1, "' not found."));
-                                pm2_1.default.disconnect();
-                                process.exit(1);
-                            }
-                            var pmId = processInfo.pm_id;
                             // eslint-disable-next-line @typescript-eslint/no-shadow
-                            pm2_1.default.delete(pmId, function (err, proc) {
+                            pm2_1.default.list(function (err, list) {
                                 if (err) {
-                                    console.error("Error killing process '".concat(processName_1, "':"), err);
+                                    console.error("Error listing PM2 processes:", err);
                                     pm2_1.default.disconnect();
                                     process.exit(2);
                                 }
-                                console.log("Process '".concat(processName_1, "' killed successfully."));
-                                pm2_1.default.disconnect();
+                                var processInfo = list.find(function (process) { return process.name === processName_1; });
+                                if (!processInfo) {
+                                    console.error("Process '".concat(processName_1, "' not found."));
+                                    pm2_1.default.disconnect();
+                                    process.exit(1);
+                                }
+                                var pmId = processInfo.pm_id;
+                                // eslint-disable-next-line @typescript-eslint/no-shadow
+                                pm2_1.default.delete(pmId, function (err) {
+                                    if (err) {
+                                        console.error("Error killing process '".concat(processName_1, "':"), err);
+                                        pm2_1.default.disconnect();
+                                        process.exit(2);
+                                    }
+                                    logHelper.consoleLog("PROCESS '".concat(processName_1, "' STOPPED SUCCESSFULLY."), states_1.States.SUCCESS);
+                                    pm2_1.default.disconnect();
+                                });
                             });
                         });
-                    });
-                }
-                scrapers.splice(scraperIndex, 1);
+                    }
+                    return [4 /*yield*/, channel.deleteQueue("SCRAPER-".concat(modelId, "-").concat(chatsite))];
+                case 1:
+                    _a.sent();
+                    this.consoleLog("QUEUE SCRAPER-".concat(modelId, "-").concat(chatsite, " DELETED."), states_1.States.WARNING);
+                    scrapers.splice(scraperIndex, 1);
+                    return [3 /*break*/, 3];
+                case 2:
+                    logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " not found"), states_1.States.ERROR);
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
             }
-            else {
-                logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " not found"), states_1.States.ERROR);
-            }
-            return [2 /*return*/];
         });
     });
 }
