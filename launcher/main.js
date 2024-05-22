@@ -66,6 +66,7 @@ var amqp = __importStar(require("amqplib"));
 var child_process_1 = require("child_process");
 var dotenv_1 = __importDefault(require("dotenv"));
 var os_1 = __importDefault(require("os"));
+var pm2_1 = __importDefault(require("pm2"));
 var tasks_1 = require("./enums/tasks");
 var states_1 = require("./enums/states");
 var log_helper_1 = require("./log-helper");
@@ -75,21 +76,10 @@ var queue = "MANAGE_SCRAPERS";
 var scrapers = [];
 var connection;
 var channel;
-function executeInNewTerminal(command, model, site) {
+function executeInNewTerminalWindows(command, model, site) {
     logHelper.consoleLog("STARTING 'SCRAPER FOR ".concat(model, " - ").concat(site, "'"), states_1.States.SUCCESS);
-    var isWindows = os_1.default.platform() === "win32";
-    var cmd;
-    var args;
-    if (isWindows) {
-        // On Windows, use cmd.exe to execute the command
-        cmd = "cmd.exe";
-        args = ["/c", command];
-    }
-    else {
-        // On Linux/Unix-like systems, execute the command directly
-        cmd = "/bin/bash";
-        args = ["-c", command];
-    }
+    var cmd = "cmd.exe";
+    var args = ["/c", command];
     var cwd = "".concat(process.cwd(), "/../chat-scraper"); // Adjust the cwd as needed
     var cmdProcess = (0, child_process_1.spawn)(cmd, args, {
         detached: true,
@@ -103,7 +93,39 @@ function executeInNewTerminal(command, model, site) {
         platform: os_1.default.platform(),
     });
 }
-function killScraperViaPid(modelId, chatsite) {
+function executeInPM2(model, site) {
+    // Connect to the PM2 daemon
+    pm2_1.default.connect(function (err) {
+        if (err) {
+            logHelper.consoleLog("Error connecting to PM2: ".concat(err), states_1.States.ERROR);
+            process.exit(2);
+        }
+        // Start the secondary application
+        pm2_1.default.start({
+            script: "/var/apps/scraper", // Path to the secondary app script
+            name: "".concat(model, "-").concat(site, "-SCRAPER"), // Name of the secondary app
+            exec_mode: "fork", // Or 'cluster' if needed
+            // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
+            args: [model, site] // Arguments passed to the script
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+        }, function (err, apps) {
+            if (err) {
+                logHelper.consoleLog("Error starting application: ".concat(err), states_1.States.ERROR);
+                pm2_1.default.disconnect(); // Disconnects from PM2
+                process.exit(2);
+            }
+            logHelper.consoleLog("Application started successfully: ".concat(apps));
+            pm2_1.default.disconnect(); // Disconnects from PM2
+        });
+    });
+    scrapers.push({
+        model: model,
+        chatsite: site,
+        pid: null,
+        platform: os_1.default.platform(),
+    });
+}
+function killScraper(modelId, chatsite) {
     return __awaiter(this, void 0, void 0, function () {
         var scraperIndex, scraper;
         return __generator(this, function (_a) {
@@ -114,13 +136,29 @@ function killScraperViaPid(modelId, chatsite) {
                 if (scraper.platform === "win32") {
                     // For Windows, use taskkill command
                     (0, child_process_1.spawn)("taskkill", ["/pid", scraper.pid.toString(), "/f", "/t"]);
+                    logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN"), states_1.States.SUCCESS);
                 }
                 else {
-                    // For other platforms (e.g., Linux), use SIGTERM signal
-                    process.kill(scraper.pid, "SIGTERM");
+                    // Connect to the PM2 daemon
+                    pm2_1.default.connect(function (err) {
+                        if (err) {
+                            console.error("Error connecting to PM2:", err);
+                            process.exit(2);
+                        }
+                        // Stop the application by name or id
+                        // eslint-disable-next-line @typescript-eslint/no-shadow
+                        pm2_1.default.stop("".concat(modelId, "-").concat(chatsite, "-SCRAPER"), function (err, proc) {
+                            if (err) {
+                                console.error("Error stopping application:", err);
+                                pm2_1.default.disconnect(); // Disconnects from PM2
+                                process.exit(2);
+                            }
+                            logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN\n ").concat(proc), states_1.States.SUCCESS);
+                            pm2_1.default.disconnect(); // Disconnects from PM2
+                        });
+                    });
                 }
                 scrapers.splice(scraperIndex, 1);
-                logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " SHUTDOWN"), states_1.States.SUCCESS);
             }
             else {
                 logHelper.consoleLog("SCRAPER ".concat(modelId, " - ").concat(chatsite, " not found"), states_1.States.ERROR);
@@ -156,22 +194,22 @@ function main() {
                             switch (job) {
                                 case tasks_1.Tasks.ACTIVATE_SCRAPER: {
                                     var token = "".concat(json.data.modelId, " ").concat(json.data.chatSiteId);
+                                    var model = json.data.modelId;
+                                    var site = json.data.chatSiteId;
                                     var command = "";
                                     if (process.env.IS_PRODUCTION === "TRUE") {
-                                        command = "".concat(process.env.START_COMMAND, " -p ").concat(token, " --name ").concat(token);
+                                        executeInPM2(model, site);
                                     }
                                     else {
                                         command = "".concat(process.env.START_COMMAND, " -p ").concat(token);
+                                        executeInNewTerminalWindows(command, model, site);
                                     }
-                                    var model = json.data.modelId;
-                                    var site = json.data.chatSiteId;
-                                    executeInNewTerminal(command, model, site);
                                     break;
                                 }
                                 case tasks_1.Tasks.KILL_SCRAPER: {
                                     var model = json.data.modelId;
                                     var site = json.data.chatSiteId;
-                                    killScraperViaPid(model, site);
+                                    killScraper(model, site);
                                     break;
                                 }
                                 default: {
