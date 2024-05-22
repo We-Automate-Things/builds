@@ -110,6 +110,7 @@ function executeInPM2(model, site) {
             args: [model, site] // Arguments passed to the script
             // eslint-disable-next-line @typescript-eslint/no-shadow
         }, function (err, app) {
+            console.log(app.pm_id);
             scrapers.push({
                 model: model,
                 chatsite: site,
@@ -147,6 +148,7 @@ function killScraper(modelId, chatsite) {
                             console.error("Error connecting to PM2:", err);
                             process.exit(2);
                         }
+                        console.log(scraper_1);
                         // Stop the application by name or id
                         // eslint-disable-next-line @typescript-eslint/no-shadow
                         pm2_1.default.stop(scraper_1.pid, function (err) {
