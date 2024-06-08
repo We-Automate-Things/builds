@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -50,41 +35,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SalesService = void 0;
-var axios_1 = __importDefault(require("axios"));
-var api_base_1 = require("../helpers/api-base");
-var SalesService = /** @class */ (function (_super) {
-    __extends(SalesService, _super);
-    function SalesService(authKey) {
-        var baseUrl = process.env.BASE_URL;
-        return _super.call(this, baseUrl, authKey) || this;
+exports.DateFormatter = void 0;
+var date_fns_1 = require("date-fns");
+var DateFormatter = /** @class */ (function () {
+    function DateFormatter() {
     }
-    SalesService.prototype.getBaseUrl = function () {
-        return "".concat(this.baseUrl, "/scraper");
-    };
-    SalesService.prototype.postTableDataToValidate = function (tableData, chatsiteId, modelId) {
+    DateFormatter.formatDate = function (date) {
         return __awaiter(this, void 0, void 0, function () {
-            var json;
+            var parsedDate;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        json = {
-                            tableData: tableData,
-                            chatsite_id: chatsiteId,
-                            model_id: modelId,
-                        };
-                        return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/earnings-data"), json, this.httpOptions)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
+                parsedDate = (0, date_fns_1.parse)(date, "MMMM dd, yyyy", new Date());
+                this.formattedDate = (0, date_fns_1.format)(parsedDate, "yyyy-MM-dd HH:mm:ss");
+                return [2 /*return*/, this.formattedDate];
             });
         });
     };
-    return SalesService;
-}(api_base_1.ApiBase));
-exports.SalesService = SalesService;
+    return DateFormatter;
+}());
+exports.DateFormatter = DateFormatter;

@@ -22,6 +22,7 @@
     "amqplib": "^0.10.3",
     "axios": "^1.6.7",
     "chalk": "^4.1.2",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.4",
     "playwright": "^1.41.2",
     "playwright-extra": "^4.3.6",

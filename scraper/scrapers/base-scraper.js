@@ -179,32 +179,14 @@ var baseScraper = /** @class */ (function () {
     };
     baseScraper.prototype.stopTaskManagement = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var payload, message, queue, error_1;
+            var error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, 3, 6]);
-                        payload = {
-                            displayName: "KILL_SCRAPER",
-                            job: "KILL_SCRAPER",
-                            maxTries: null,
-                            maxExceptions: null,
-                            failOnTimeout: false,
-                            backoff: null,
-                            timeout: null,
-                            data: {
-                                modelId: this.modelId,
-                                chatSiteId: this.chatsiteId
-                            },
-                        };
-                        message = JSON.stringify(payload);
-                        queue = "MANAGE_SCRAPERS";
-                        // Send the message to the task queue
                         return [4 /*yield*/, this.channel.deleteQueue(this.queue)];
                     case 1:
-                        // Send the message to the task queue
                         _a.sent();
-                        this.channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
                         this.consoleLog("QUEUE ".concat(this.queue, " DELETED."), states_1.States.WARNING);
                         return [3 /*break*/, 6];
                     case 2:
