@@ -102,7 +102,7 @@ var FancentroScraper = /** @class */ (function (_super) {
                         }, 15000);
                         _b.label = 9;
                     case 9:
-                        if (!(this.task != tasks_1.Tasks.KILL_SCRAPER)) return [3 /*break*/, 18];
+                        if (!(this.task !== tasks_1.Tasks.KILL_SCRAPER)) return [3 /*break*/, 18];
                         _a = this.task;
                         switch (_a) {
                             case tasks_1.Tasks.FORCE_CONTENT_REFRESH: return [3 /*break*/, 10];
@@ -573,7 +573,7 @@ var FancentroScraper = /** @class */ (function (_super) {
                         return [4 /*yield*/, buttonLocator.click()];
                     case 1:
                         _a.sent();
-                        return [3 /*break*/, 2];
+                        _a.label = 2;
                     case 2: return [2 /*return*/];
                 }
             });

@@ -100,11 +100,7 @@ var baseScraper = /** @class */ (function () {
             var productionMode;
             var _this = this;
             return __generator(this, function (_a) {
-                setInterval(function () {
-                    // EVERY 5M LOGS THE RAM USAGE OF THIS SPECIFIC PROCESS
-                    _this.logRamUsage();
-                }, 60000 * 5);
-                productionMode = (String(process.env.PRODUCTION_MODE).toLowerCase() === 'true');
+                productionMode = (String(process.env.PRODUCTION_MODE).toLowerCase() === "true");
                 this.chromium.launch({ headless: productionMode }).then(function (browser) { return __awaiter(_this, void 0, void 0, function () {
                     var _a, _b;
                     return __generator(this, function (_c) {
@@ -139,18 +135,24 @@ var baseScraper = /** @class */ (function () {
                 switch (_c.label) {
                     case 0:
                         _a = this;
-                        return [4 /*yield*/, amqp.connect('amqp://localhost')];
+                        return [4 /*yield*/, amqp.connect("amqp://localhost")];
                     case 1:
                         _a.connection = _c.sent();
                         _b = this;
                         return [4 /*yield*/, this.connection.createChannel()];
                     case 2:
                         _b.channel = _c.sent();
-                        exchange = 'default';
-                        this.queue = 'SCRAPER_' + this.modelId + '_' + this.chatsiteId;
-                        this.routingKey = 'SCRAPER_' + this.modelId + '_' + this.chatsiteId;
-                        return [4 /*yield*/, this.channel.assertQueue(this.queue)];
+                        exchange = "default";
+                        this.queue = "SCRAPER_".concat(this.modelId, "_").concat(this.chatsiteId);
+                        this.routingKey = "SCRAPER_".concat(this.modelId, "_").concat(this.chatsiteId);
+                        return [4 /*yield*/, this.channel.assertExchange(exchange, "direct", { durable: true })];
                     case 3:
+                        _c.sent();
+                        return [4 /*yield*/, this.channel.assertQueue(this.queue, { durable: true })];
+                    case 4:
+                        _c.sent();
+                        return [4 /*yield*/, this.channel.bindQueue(this.queue, exchange, this.routingKey)];
+                    case 5:
                         _c.sent();
                         this.channel.consume(this.queue, function (msg) {
                             if (msg !== null) {
@@ -218,7 +220,7 @@ var baseScraper = /** @class */ (function () {
         if (state === void 0) { state = "INFO"; }
         chalk_1.default.level = 1;
         var date = new Date();
-        var formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+        var formattedDate = date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" });
         switch (state) {
             case states_1.States.SUCCESS:
                 console.log(chalk_1.default.green("".concat(formattedDate, " - ").concat(message)));

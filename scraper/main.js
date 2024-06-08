@@ -45,13 +45,14 @@ var puppeteer_extra_plugin_stealth_1 = __importDefault(require("puppeteer-extra-
 var puppeteer_extra_plugin_recaptcha_1 = __importDefault(require("puppeteer-extra-plugin-recaptcha"));
 var dotenv_1 = __importDefault(require("dotenv"));
 // CUSTOM IMPORTS
+var path_1 = __importDefault(require("path"));
+var fs_1 = __importDefault(require("fs"));
 var InitiateError_1 = require("./exceptions/InitiateError");
 var exceptionStringEnums_1 = require("./exceptions/exceptionStringEnums");
 var fancentro_scraper_1 = require("./scrapers/fancentro-scraper");
+var f2f_scraper_1 = require("./scrapers/f2f-scraper");
 var auth_helper_1 = require("./helpers/auth-helper");
 var model_credential_service_1 = require("./services/model-credential-service");
-var path_1 = __importDefault(require("path"));
-var fs_1 = __importDefault(require("fs"));
 console.log("INITIATE SCRAPER");
 dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
 var modelId = null;
@@ -70,9 +71,9 @@ if (!modelId) {
 if (!chatsiteName) {
     throw new InitiateError_1.InitiateError(exceptionStringEnums_1.ExceptionStringEnums.initiateInvalidParameterChatsiteId);
 }
-process.on('uncaughtException', function (err) {
-    var logFileName = "error_".concat(new Date().toISOString().replace(/:/g, '-').split('T')[0], ".log");
-    var logFilePath = path_1.default.join(__dirname + "/logs", logFileName);
+process.on("uncaughtException", function (err) {
+    var logFileName = "error_".concat(new Date().toISOString().replace(/:/g, "-").split("T")[0], ".log");
+    var logFilePath = path_1.default.join("".concat(__dirname, "/logs"), logFileName);
     // Check if the log file already exists
     var logMessage = "==========================================================\nTIME: ".concat(new Date().toISOString(), "\nMODEL: ").concat(modelId, "\nCHATSITE: ").concat(chatsiteName, "\nERROR: ").concat(err.message, "\nSTACK: ").concat(err.stack, "\n==========================================================\n");
     if (fs_1.default.existsSync(logFilePath)) {
@@ -86,7 +87,7 @@ console.log("RECEIVED ALL NEEDED PARAMETERS");
 playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_recaptcha_1.default)({ provider: { id: "2captcha", token: process.env.CAPTCHA_KEY }, visualFeedback: true, throwOnError: true }));
 playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_stealth_1.default)());
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var initialAuthHelper, _a, privateKey, modelCredentialService, modelCredentials, fancentroScraper;
+    var initialAuthHelper, _a, privateKey, modelCredentialService, modelCredentials, fancentroScraper, privateKey, modelCredentialService, modelCredentials, f2fScraper;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -94,8 +95,9 @@ playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_stealth_1.default)())
                 _a = chatsiteName;
                 switch (_a) {
                     case "FANCENTRO": return [3 /*break*/, 1];
+                    case "F2F": return [3 /*break*/, 5];
                 }
-                return [3 /*break*/, 5];
+                return [3 /*break*/, 9];
             case 1: return [4 /*yield*/, initialAuthHelper.getAuthKey(modelId, "FANCENTRO")];
             case 2:
                 privateKey = _b.sent();
@@ -107,13 +109,25 @@ playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_stealth_1.default)())
                 return [4 /*yield*/, fancentroScraper.initiateScraperFlow()];
             case 4:
                 _b.sent();
-                return [3 /*break*/, 6];
-            case 5:
+                return [3 /*break*/, 10];
+            case 5: return [4 /*yield*/, initialAuthHelper.getAuthKey(modelId, "F2F")];
+            case 6:
+                privateKey = _b.sent();
+                modelCredentialService = new model_credential_service_1.ModelCredentialService(privateKey);
+                return [4 /*yield*/, modelCredentialService.postFetchModelCredentials(modelId, "F2F")];
+            case 7:
+                modelCredentials = _b.sent();
+                f2fScraper = new f2f_scraper_1.F2fScraper(playwright_extra_1.chromium, modelCredentials, privateKey, modelId, chatsiteName);
+                return [4 /*yield*/, f2fScraper.initiateScraperFlow()];
+            case 8:
+                _b.sent();
+                return [3 /*break*/, 10];
+            case 9:
                 {
                     throw new InitiateError_1.InitiateError(exceptionStringEnums_1.ExceptionStringEnums.initiateFailToLaunchScraper.concat(chatsiteName));
                 }
-                _b.label = 6;
-            case 6: return [2 /*return*/];
+                _b.label = 10;
+            case 10: return [2 /*return*/];
         }
     });
 }); })();
