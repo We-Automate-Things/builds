@@ -122,12 +122,47 @@
     "extend_client_info": "Are you sure you want extend the client for this model?\nThis action will temporary suspend all client traffic, after a few seconds the key is extended for a new period.\nPlease ensure that this is the intended action before proceeding.",
     "deactivate_client_info": "Are you sure you want deactivate the client for this model?\nThis action will permanently suspend all client traffic.\nPlease ensure that this is the intended action before proceeding.",
 
+    "search_placeholder": "Search...",
+
+    "_ANALYTICS": "",
+    "analytics-title": "Analytics",
+    "analytics-panel-header": "Revenue",
+    "total-profit": "Total Profit",
+    "top-models": "Top Models",
+    "model-table-header": "Models",
+    "model-table-header-sales": "Sales Made",
+    "model-table-header-earnings": "Earnings",
+    "top-chatters": "Top Chatters",
+    "recent-orders": "Recent Orders",
+    "content-sold": "Content Sold",
+    "recent-orders-model-name": "Model",
+    "recent-orders-soldby-name": "Sold By",
+    "recent-orders-status": "Status",
+    "recent-orders-date": "Date",
+
+
+
+    "_PAYOUTS": "",
+    "payout-title": "Payouts",
+    "payout-start-date": "Payout Start Date",
+    "payout-interval": "Choose Interval",
+    "payout-daily-text": "Daily",
+    "payout-weekly-text": "Weekly",
+    "payout-biweekly-text": "Bi-Weekly",
+    "payout-monthly-text": "Monthly",
+
+
 
     "_HEADER PROFILE POPUP": "",
     "profile": "Profile",
     "Inbox": "Inbox",
     "Lockscreen": "Lock Screen",
     "signout_button": "Sign Out",
+
+    "_PROFILE PAGE": "",
+    "daily_sale_revenue_pane_title": "Daily Sale Revenue",
+    "revenue_pane_title": "Revenue",
+    "sales_by_category_pane_title": "Sales By Category",
 
     "_MODALS": "",
     "_CONTENT MODAL": "",
