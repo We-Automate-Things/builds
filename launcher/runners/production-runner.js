@@ -132,7 +132,7 @@ var ProductionRunner = /** @class */ (function (_super) {
                 script: "/var/apps/scraper/main.js", // Path to the secondary app script
                 name: "SCRAPER-".concat(model, "-").concat(site), // Name of the secondary app
                 exec_mode: "fork", // Or 'cluster' if needed
-                // max_memory_restart: "100M", // Optional: Restart if it exceeds 100MB
+                max_memory_restart: "300M", // Optional: Restart if it exceeds 100MB
                 args: [model, site] // Arguments passed to the script
                 // eslint-disable-next-line @typescript-eslint/no-shadow
             }, function (err) {
