@@ -58,9 +58,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseRunner = void 0;
 var amqp = __importStar(require("amqplib"));
+var os_1 = __importDefault(require("os"));
 var log_helper_1 = require("../log-helper");
 var states_1 = require("../enums/states");
 var tasks_1 = require("../enums/tasks");
@@ -90,6 +94,7 @@ var BaseRunner = /** @class */ (function () {
                         _c.sent();
                         setInterval(function () {
                             _this.logHelper.consoleLog("WAITING FOR MESSAGES", states_1.States.PACKAGE);
+                            _this.getRamUsage();
                         }, 1000 * 60);
                         this.channel.consume(this.queue, function (msg) {
                             if (msg !== null) {
@@ -129,6 +134,14 @@ var BaseRunner = /** @class */ (function () {
                 }
             });
         });
+    };
+    BaseRunner.prototype.getRamUsage = function () {
+        var totalMemory = os_1.default.totalmem();
+        var freeMemory = os_1.default.freemem();
+        var usedMemory = totalMemory - freeMemory;
+        var usedMemoryPercentage = (usedMemory / totalMemory) * 100;
+        this.logHelper.consoleLog("CURRENT RAM USAGE: ".concat(usedMemoryPercentage.toFixed(2), "%"));
+        return usedMemoryPercentage;
     };
     return BaseRunner;
 }());

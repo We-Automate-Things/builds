@@ -120,10 +120,9 @@ var ProductionRunner = /** @class */ (function (_super) {
         });
     };
     ProductionRunner.prototype.launchScraper = function (command, model, site) {
-        // Connect to the PM2 daemon
         var _this = this;
+        // Connect to the PM2 daemon
         var usedMemoryPercentage = this.getRamUsage();
-        this.logHelper.consoleLog("CURRENT RAM USAGE: ".concat(usedMemoryPercentage.toFixed(2), "%"));
         if (usedMemoryPercentage < 90) {
             pm2_1.default.connect(function (err) {
                 if (err) {
@@ -186,12 +185,6 @@ var ProductionRunner = /** @class */ (function (_super) {
             }
             catch (err) { /* empty */ }
         }
-    };
-    ProductionRunner.prototype.getRamUsage = function () {
-        var totalMemory = os_1.default.totalmem();
-        var freeMemory = os_1.default.freemem();
-        var usedMemory = totalMemory - freeMemory;
-        return (usedMemory / totalMemory) * 100;
     };
     return ProductionRunner;
 }(base_runner_1.BaseRunner));
