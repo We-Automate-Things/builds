@@ -120,37 +120,78 @@ var ProductionRunner = /** @class */ (function (_super) {
         });
     };
     ProductionRunner.prototype.launchScraper = function (command, model, site) {
-        var _this = this;
         // Connect to the PM2 daemon
-        pm2_1.default.connect(function (err) {
-            if (err) {
-                _this.logHelper.consoleLog("Error connecting to PM2: ".concat(err), states_1.States.ERROR);
-                process.exit(2);
-            }
-            // Start the secondary application
-            pm2_1.default.start({
-                script: "/var/apps/scraper/main.js", // Path to the secondary app script
-                name: "SCRAPER-".concat(model, "-").concat(site), // Name of the secondary app
-                exec_mode: "fork", // Or 'cluster' if needed
-                max_memory_restart: "300M", // Optional: Restart if it exceeds 100MB
-                args: [model, site] // Arguments passed to the script
-                // eslint-disable-next-line @typescript-eslint/no-shadow
-            }, function (err) {
-                _this.scrapers.push({
-                    model: model,
-                    chatsite: site,
-                    pid: null,
-                    platform: os_1.default.platform(),
-                });
+        var _this = this;
+        var usedMemoryPercentage = this.getRamUsage();
+        this.logHelper.consoleLog("CURRENT RAM USAGE: ".concat(usedMemoryPercentage.toFixed(2), "%"));
+        if (usedMemoryPercentage < 90) {
+            pm2_1.default.connect(function (err) {
                 if (err) {
-                    _this.logHelper.consoleLog("Error starting application: ".concat(err), states_1.States.ERROR);
-                    pm2_1.default.disconnect(); // Disconnects from PM2
+                    _this.logHelper.consoleLog("Error connecting to PM2: ".concat(err), states_1.States.ERROR);
                     process.exit(2);
                 }
-                _this.logHelper.consoleLog("SCRAPER SUCCESSFULLY STARTED ".concat(model, " - ").concat(site, " "), states_1.States.SUCCESS);
-                pm2_1.default.disconnect(); // Disconnects from PM2
+                // Start the secondary application
+                pm2_1.default.start({
+                    script: "/var/apps/scraper/main.js", // Path to the secondary app script
+                    name: "SCRAPER-".concat(model, "-").concat(site), // Name of the secondary app
+                    exec_mode: "fork", // Or 'cluster' if needed
+                    max_memory_restart: "300M", // Optional: Restart if it exceeds 100MB
+                    stop_exit_codes: [10],
+                    args: [model, site] // Arguments passed to the script
+                    // eslint-disable-next-line @typescript-eslint/no-shadow
+                }, function (err) {
+                    _this.scrapers.push({
+                        model: model,
+                        chatsite: site,
+                        pid: null,
+                        platform: os_1.default.platform(),
+                    });
+                    if (err) {
+                        _this.logHelper.consoleLog("Error starting application: ".concat(err), states_1.States.ERROR);
+                        pm2_1.default.disconnect(); // Disconnects from PM2
+                        process.exit(2);
+                    }
+                    _this.logHelper.consoleLog("SCRAPER SUCCESSFULLY STARTED ".concat(model, " - ").concat(site, " "), states_1.States.SUCCESS);
+                    pm2_1.default.disconnect(); // Disconnects from PM2
+                });
             });
-        });
+        }
+        else {
+            try {
+                var payload = {
+                    displayName: "ACTIVATE_SCRAPER",
+                    job: "ACTIVATE_SCRAPER",
+                    maxTries: null,
+                    maxExceptions: null,
+                    failOnTimeout: false,
+                    backoff: null,
+                    timeout: null,
+                    data: {
+                        modelId: model,
+                        chatSiteId: site
+                    },
+                };
+                var message = JSON.stringify(payload);
+                var queue = "";
+                if (this.queue === "MANAGE_SCRAPERS") {
+                    queue = "MANAGE_SCRAPERS_1";
+                }
+                else {
+                    var splitQueue = this.queue.split("_");
+                    var queueIdentifier = parseInt(splitQueue[2], 10);
+                    queue = "MANAGE_SCRAPERS_".concat(queueIdentifier);
+                }
+                this.logHelper.consoleLog("TASK GOT SEND TO ".concat(queue, ", DUE TO INSUFFICIENT RAM"));
+                this.channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
+            }
+            catch (err) { /* empty */ }
+        }
+    };
+    ProductionRunner.prototype.getRamUsage = function () {
+        var totalMemory = os_1.default.totalmem();
+        var freeMemory = os_1.default.freemem();
+        var usedMemory = totalMemory - freeMemory;
+        return (usedMemory / totalMemory) * 100;
     };
     return ProductionRunner;
 }(base_runner_1.BaseRunner));

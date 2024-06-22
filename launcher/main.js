@@ -43,6 +43,15 @@ var dotenv_1 = __importDefault(require("dotenv"));
 var local_runner_1 = require("./runners/local-runner");
 var production_runner_1 = require("./runners/production-runner");
 dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
+var managerQueue = null;
+if (process.env.IS_PRODUCTION === "false") {
+    // eslint-disable-next-line prefer-destructuring
+    managerQueue = process.argv[3];
+}
+else {
+    // eslint-disable-next-line prefer-destructuring
+    managerQueue = process.argv[3];
+}
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var _a, productionRunner, localRunner;
     return __generator(this, function (_b) {
@@ -55,13 +64,13 @@ dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
                 }
                 return [3 /*break*/, 5];
             case 1:
-                productionRunner = new production_runner_1.ProductionRunner();
+                productionRunner = new production_runner_1.ProductionRunner(managerQueue);
                 return [4 /*yield*/, productionRunner.initiateLauncher()];
             case 2:
                 _b.sent();
                 return [3 /*break*/, 6];
             case 3:
-                localRunner = new local_runner_1.LocalRunner();
+                localRunner = new local_runner_1.LocalRunner(managerQueue);
                 return [4 /*yield*/, localRunner.initiateLauncher()];
             case 4:
                 _b.sent();

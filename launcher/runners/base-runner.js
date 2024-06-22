@@ -65,9 +65,9 @@ var log_helper_1 = require("../log-helper");
 var states_1 = require("../enums/states");
 var tasks_1 = require("../enums/tasks");
 var BaseRunner = /** @class */ (function () {
-    function BaseRunner() {
+    function BaseRunner(managerQueue) {
         this.logHelper = new log_helper_1.LogHelper();
-        this.queue = "MANAGE_SCRAPERS";
+        this.queue = managerQueue;
         this.scrapers = [];
     }
     BaseRunner.prototype.initiateLauncher = function () {
