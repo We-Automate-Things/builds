@@ -50,7 +50,7 @@ if (process.env.IS_PRODUCTION === "false") {
 }
 else {
     // eslint-disable-next-line prefer-destructuring
-    managerQueue = process.argv[3];
+    managerQueue = process.argv[2];
 }
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var _a, productionRunner, localRunner;
