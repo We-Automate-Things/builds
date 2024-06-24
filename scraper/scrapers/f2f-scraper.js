@@ -58,8 +58,8 @@ var states_1 = require("../enums/states");
 var date_formatter_1 = require("../helpers/date-formatter");
 var F2fScraper = /** @class */ (function (_super) {
     __extends(F2fScraper, _super);
-    function F2fScraper(browserAgent, modelCredential, privateKey, modelId, chatsiteName) {
-        var _this = _super.call(this, browserAgent, modelCredential, privateKey, modelId, chatsiteName) || this;
+    function F2fScraper(proxy, browserAgent, modelCredential, privateKey, modelId, chatsiteName) {
+        var _this = _super.call(this, proxy, browserAgent, modelCredential, privateKey, modelId, chatsiteName) || this;
         _this.consoleLog("INITIATING F2F");
         return _this;
     }
@@ -88,15 +88,18 @@ var F2fScraper = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.pageOne.locator(".qpejaG_buttons>._8HzuwW_primary").click()];
                     case 5:
                         _b.sent();
-                        return [4 /*yield*/, this.validateSignIn()];
+                        return [4 /*yield*/, this.pageOne.waitForTimeout(2000)];
                     case 6:
-                        validSignIn = _b.sent();
-                        if (!validSignIn) return [3 /*break*/, 20];
-                        return [4 /*yield*/, this.handlePopup()];
+                        _b.sent();
+                        return [4 /*yield*/, this.validateSignIn()];
                     case 7:
+                        validSignIn = _b.sent();
+                        if (!validSignIn) return [3 /*break*/, 21];
+                        return [4 /*yield*/, this.handlePopup()];
+                    case 8:
                         _b.sent();
                         return [4 /*yield*/, this.retrieveContent()];
-                    case 8:
+                    case 9:
                         _b.sent();
                         setInterval(function () {
                             _this.getAllNewEarnings();
@@ -106,45 +109,45 @@ var F2fScraper = /** @class */ (function (_super) {
                             // create new context in the retrieveContent method for opening new tab
                             _this.retrieveContent();
                         }, 60000 * 60 * 2); // Interval time may be altered later on.
-                        _b.label = 9;
-                    case 9:
-                        if (!(this.task !== tasks_1.Tasks.KILL_SCRAPER)) return [3 /*break*/, 18];
+                        _b.label = 10;
+                    case 10:
+                        if (!(this.task !== tasks_1.Tasks.KILL_SCRAPER)) return [3 /*break*/, 19];
                         _a = this.task;
                         switch (_a) {
-                            case tasks_1.Tasks.FORCE_CONTENT_REFRESH: return [3 /*break*/, 10];
+                            case tasks_1.Tasks.FORCE_CONTENT_REFRESH: return [3 /*break*/, 11];
                         }
-                        return [3 /*break*/, 12];
-                    case 10: return [4 /*yield*/, this.retrieveContent()];
-                    case 11:
+                        return [3 /*break*/, 13];
+                    case 11: return [4 /*yield*/, this.retrieveContent()];
+                    case 12:
                         _b.sent();
                         this.task = tasks_1.Tasks.NO_TASK;
-                        return [3 /*break*/, 17];
-                    case 12:
+                        return [3 /*break*/, 18];
+                    case 13:
                         this.consoleLog("LOADING MESSAGES");
                         return [4 /*yield*/, this.pageOne.goto("https://f2f.com/messenger")];
-                    case 13:
-                        _b.sent();
-                        return [4 /*yield*/, this.pageOne.waitForTimeout(10000)];
                     case 14:
                         _b.sent();
-                        return [4 /*yield*/, this.interactWithChat()];
+                        return [4 /*yield*/, this.pageOne.waitForTimeout(10000)];
                     case 15:
+                        _b.sent();
+                        return [4 /*yield*/, this.interactWithChat()];
+                    case 16:
                         _b.sent();
                         this.consoleLog("RESET FOR LOCATING NEW CHATS", states_1.States.WARNING);
                         return [4 /*yield*/, this.pageOne.goto("https://f2f.com/messenger")];
-                    case 16:
+                    case 17:
                         _b.sent();
-                        _b.label = 17;
-                    case 17: return [3 /*break*/, 9];
-                    case 18:
+                        _b.label = 18;
+                    case 18: return [3 /*break*/, 10];
+                    case 19:
                         this.consoleLog("SHUTTING DOWN SCRAPER", states_1.States.WARNING);
                         return [4 /*yield*/, this.stopTaskManagement()];
-                    case 19:
+                    case 20:
                         _b.sent();
                         this.consoleLog("SCRAPER SHUTDOWN", states_1.States.WARNING);
                         process.exit();
-                        _b.label = 20;
-                    case 20: return [2 /*return*/];
+                        _b.label = 21;
+                    case 21: return [2 /*return*/];
                 }
             });
         });
@@ -275,7 +278,7 @@ var F2fScraper = /** @class */ (function (_super) {
                             var hasNewChats = false;
                             if (unreadCountBadge_1) {
                                 var newMessageCounter = slicedChat[3];
-                                if (newMessageCounter !== undefined && !isNaN(Number(newMessageCounter))) {
+                                if (newMessageCounter !== undefined && !Number.isNaN(Number(newMessageCounter))) {
                                     hasNewChats = true;
                                 }
                             }
@@ -554,7 +557,7 @@ var F2fScraper = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.pageOne.locator("._8HzuwW_primary").filter({ hasText: "Next" }).click()];
                     case 14:
                         _a.sent();
-                        if (!(price !== undefined && !isNaN(Number(price)))) return [3 /*break*/, 20];
+                        if (!(price !== undefined && !Number.isNaN(Number(price)))) return [3 /*break*/, 20];
                         if (!(Number(price) === 0)) return [3 /*break*/, 16];
                         return [4 /*yield*/, this.pageOne.locator(".JJdPra_title").filter({ hasText: "Free" }).click()];
                     case 15:
@@ -643,9 +646,74 @@ var F2fScraper = /** @class */ (function (_super) {
             });
         });
     };
+    // Function to scroll down the page
+    F2fScraper.prototype.scrollDown = function (page) {
+        return __awaiter(this, void 0, void 0, function () {
+            var previousHeight, reachedEnd, currentHeight, i, currentHeight;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, page.evaluate("document.body.scrollHeight")];
+                    case 1:
+                        previousHeight = _a.sent();
+                        reachedEnd = false;
+                        _a.label = 2;
+                    case 2:
+                        if (!!reachedEnd) return [3 /*break*/, 6];
+                        return [4 /*yield*/, page.evaluate("window.scrollTo(0, document.body.scrollHeight)")];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, page.waitForTimeout(1000)];
+                    case 4:
+                        _a.sent(); // Wait for the page to load more content
+                        return [4 /*yield*/, page.evaluate("document.body.scrollHeight")];
+                    case 5:
+                        currentHeight = _a.sent();
+                        if (currentHeight === previousHeight) {
+                            reachedEnd = true;
+                        }
+                        else {
+                            previousHeight = currentHeight;
+                        }
+                        return [3 /*break*/, 2];
+                    case 6:
+                        i = 0;
+                        _a.label = 7;
+                    case 7:
+                        if (!(i < 2)) return [3 /*break*/, 12];
+                        return [4 /*yield*/, page.evaluate("window.scrollTo(0, document.body.scrollHeight)")];
+                    case 8:
+                        _a.sent();
+                        return [4 /*yield*/, page.waitForTimeout(1000)];
+                    case 9:
+                        _a.sent(); // Wait for the page to load more content
+                        return [4 /*yield*/, page.evaluate("document.body.scrollHeight")];
+                    case 10:
+                        currentHeight = _a.sent();
+                        if (currentHeight !== previousHeight) {
+                            reachedEnd = false;
+                            previousHeight = currentHeight;
+                            return [3 /*break*/, 12];
+                        }
+                        _a.label = 11;
+                    case 11:
+                        i++;
+                        return [3 /*break*/, 7];
+                    case 12:
+                        if (reachedEnd) {
+                            console.log("Confirmed: Reached the end of the page");
+                        }
+                        else {
+                            console.log("Page still scrolls after additional checks");
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ;
     F2fScraper.prototype.retrieveContentByTag = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var contentObjects, tagPrefix, tag, imgSrc, isVideo, contentType;
+            var contentObjects, tagPrefix, tag, isVisible, imgSrc, isVideo, contentType;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -653,22 +721,26 @@ var F2fScraper = /** @class */ (function (_super) {
                         contentObjects = [];
                         tagPrefix = "chickflix-";
                         tag = "";
+                        isVisible = false;
                         this.consoleLog("WAITING FOR ALL IMAGES TO LOAD");
-                        return [4 /*yield*/, this.pageThree.waitForTimeout(1000)];
+                        return [4 /*yield*/, this.scrollDown(this.pageThree)];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, this.pageThree.locator(".OYFodq_wrapper").first().click()];
+                        return [4 /*yield*/, this.pageThree.waitForTimeout(1000)];
                     case 2:
                         _a.sent();
-                        _a.label = 3;
-                    case 3: return [4 /*yield*/, this.pageThree.locator(".MN_X0W_mediaName").innerText()];
-                    case 4:
+                        return [4 /*yield*/, this.pageThree.locator(".OYFodq_wrapper").first().click()];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [4 /*yield*/, this.pageThree.locator(".MN_X0W_mediaName").innerText()];
+                    case 5:
                         tag = _a.sent();
                         return [4 /*yield*/, this.pageThree.locator(".swiper-slide-active>div>div>img").getAttribute("src")];
-                    case 5:
+                    case 6:
                         imgSrc = _a.sent();
                         return [4 /*yield*/, this.pageThree.locator(".swiper-slide-active>div>._0lhlyq_playIcon").count()];
-                    case 6:
+                    case 7:
                         isVideo = (_a.sent()) > 0;
                         contentType = "";
                         if (isVideo) {
@@ -678,37 +750,56 @@ var F2fScraper = /** @class */ (function (_super) {
                             contentType = "photo";
                         }
                         try {
-                            if (tag.includes(tagPrefix))
-                                contentObjects.push({
-                                    tag: tag.toString(),
-                                    url: imgSrc.toString(),
-                                    content_type: contentType.toString(),
-                                });
+                            // if (tag.includes(tagPrefix))
+                            contentObjects.push({
+                                tag: tag.toString(),
+                                url: imgSrc.toString(),
+                                content_type: contentType.toString(),
+                            });
                         }
                         catch (error) {
                             return [2 /*return*/, error];
                         }
                         this.consoleLog("GOING TO NEXT CONTENT");
                         return [4 /*yield*/, this.pageThree.locator(".swiper-button-next").click()];
-                    case 7:
-                        _a.sent();
-                        return [4 /*yield*/, this.pageThree.waitForTimeout(1000)];
                     case 8:
                         _a.sent();
-                        _a.label = 9;
+                        return [4 /*yield*/, this.isElementVisible(this.pageThree, "swiper-button-disabled")];
                     case 9:
-                        if (tag.includes(tagPrefix)) return [3 /*break*/, 3];
+                        // await this.pageThree.waitForTimeout(1000);
+                        isVisible = _a.sent();
                         _a.label = 10;
                     case 10:
+                        if (!isVisible) return [3 /*break*/, 4];
+                        _a.label = 11;
+                    case 11:
                         this.consoleLog("SENDING UNPROCESSED CONTENT INFO TO API");
                         return [4 /*yield*/, this.contentInfoService.postContentInfo(contentObjects, this.modelId, this.chatsiteId)];
-                    case 11:
+                    case 12:
                         _a.sent();
                         return [2 /*return*/, contentObjects];
                 }
             });
         });
     };
+    F2fScraper.prototype.isElementVisible = function (page, className) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, page.evaluate(function (className) {
+                            var element = document.querySelector(".".concat(className));
+                            if (element) {
+                                var rect = element.getBoundingClientRect();
+                                return rect.width > 0 && rect.height > 0;
+                            }
+                            return false;
+                        }, className)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    ;
     F2fScraper.prototype.fetchEarningsData = function () {
         return __awaiter(this, void 0, void 0, function () {
             var transactions, tableData, _i, transactions_1, transaction, date, priceText, descriptionElement, descriptionClass, _a, typeFromDescription, payedBy, _b, _c, _d, _e, _f, _g, e_1;
@@ -786,9 +877,7 @@ var F2fScraper = /** @class */ (function (_super) {
                     case 20:
                         _i++;
                         return [3 /*break*/, 8];
-                    case 21:
-                        console.log(tableData);
-                        return [2 /*return*/, tableData];
+                    case 21: return [2 /*return*/, tableData];
                     case 22:
                         e_1 = _j.sent();
                         return [2 /*return*/, []];

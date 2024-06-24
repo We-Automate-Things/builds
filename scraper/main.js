@@ -53,6 +53,8 @@ var fancentro_scraper_1 = require("./scrapers/fancentro-scraper");
 var f2f_scraper_1 = require("./scrapers/f2f-scraper");
 var auth_helper_1 = require("./helpers/auth-helper");
 var model_credential_service_1 = require("./services/model-credential-service");
+var proxy_service_1 = require("./services/proxy-service");
+var proxies_1 = require("./enums/proxies");
 console.log("INITIATE SCRAPER");
 dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
 var modelId = null;
@@ -87,47 +89,76 @@ console.log("RECEIVED ALL NEEDED PARAMETERS");
 playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_recaptcha_1.default)({ provider: { id: "2captcha", token: process.env.CAPTCHA_KEY }, visualFeedback: true, throwOnError: true }));
 playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_stealth_1.default)());
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var initialAuthHelper, _a, privateKey, modelCredentialService, modelCredentials, fancentroScraper, privateKey, modelCredentialService, modelCredentials, f2fScraper;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var initialAuthHelper, _a, _b, privateKey, proxyType, proxy, modelCredentialService, modelCredentials, fancentroScraper, _c, privateKey, proxyType, proxy, modelCredentialService, modelCredentials, f2fScraper;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
                 initialAuthHelper = new auth_helper_1.AuthHelper();
                 _a = chatsiteName;
                 switch (_a) {
                     case "FANCENTRO": return [3 /*break*/, 1];
-                    case "F2F": return [3 /*break*/, 5];
+                    case "F2F": return [3 /*break*/, 6];
                 }
-                return [3 /*break*/, 9];
+                return [3 /*break*/, 11];
             case 1: return [4 /*yield*/, initialAuthHelper.getAuthKey(modelId, "FANCENTRO")];
             case 2:
-                privateKey = _b.sent();
+                _b = _d.sent(), privateKey = _b[0], proxyType = _b[1];
+                return [4 /*yield*/, proxyValidation(privateKey, proxyType)];
+            case 3:
+                proxy = _d.sent();
                 modelCredentialService = new model_credential_service_1.ModelCredentialService(privateKey);
                 return [4 /*yield*/, modelCredentialService.postFetchModelCredentials(modelId, "FANCENTRO")];
-            case 3:
-                modelCredentials = _b.sent();
-                fancentroScraper = new fancentro_scraper_1.FancentroScraper(playwright_extra_1.chromium, modelCredentials, privateKey, modelId, chatsiteName);
-                return [4 /*yield*/, fancentroScraper.initiateScraperFlow()];
             case 4:
-                _b.sent();
-                return [3 /*break*/, 10];
-            case 5: return [4 /*yield*/, initialAuthHelper.getAuthKey(modelId, "F2F")];
-            case 6:
-                privateKey = _b.sent();
+                modelCredentials = _d.sent();
+                fancentroScraper = new fancentro_scraper_1.FancentroScraper(proxy, playwright_extra_1.chromium, modelCredentials, privateKey, modelId, chatsiteName);
+                return [4 /*yield*/, fancentroScraper.initiateScraperFlow()];
+            case 5:
+                _d.sent();
+                return [3 /*break*/, 12];
+            case 6: return [4 /*yield*/, initialAuthHelper.getAuthKey(modelId, "F2F")];
+            case 7:
+                _c = _d.sent(), privateKey = _c[0], proxyType = _c[1];
+                return [4 /*yield*/, proxyValidation(privateKey, proxyType)];
+            case 8:
+                proxy = _d.sent();
                 modelCredentialService = new model_credential_service_1.ModelCredentialService(privateKey);
                 return [4 /*yield*/, modelCredentialService.postFetchModelCredentials(modelId, "F2F")];
-            case 7:
-                modelCredentials = _b.sent();
-                f2fScraper = new f2f_scraper_1.F2fScraper(playwright_extra_1.chromium, modelCredentials, privateKey, modelId, chatsiteName);
-                return [4 /*yield*/, f2fScraper.initiateScraperFlow()];
-            case 8:
-                _b.sent();
-                return [3 /*break*/, 10];
             case 9:
+                modelCredentials = _d.sent();
+                f2fScraper = new f2f_scraper_1.F2fScraper(proxy, playwright_extra_1.chromium, modelCredentials, privateKey, modelId, chatsiteName);
+                return [4 /*yield*/, f2fScraper.initiateScraperFlow()];
+            case 10:
+                _d.sent();
+                return [3 /*break*/, 12];
+            case 11:
                 {
                     throw new InitiateError_1.InitiateError(exceptionStringEnums_1.ExceptionStringEnums.initiateFailToLaunchScraper.concat(chatsiteName));
                 }
-                _b.label = 10;
-            case 10: return [2 /*return*/];
+                _d.label = 12;
+            case 12: return [2 /*return*/];
         }
     });
 }); })();
+function proxyValidation(privateKey, proxyType) {
+    return __awaiter(this, void 0, void 0, function () {
+        var proxyService, proxy, isEmptyProxy;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    proxyService = new proxy_service_1.ProxyService(privateKey);
+                    return [4 /*yield*/, proxyService.fetchProxy()];
+                case 1:
+                    proxy = _a.sent();
+                    isEmptyProxy = Object.keys(proxy).length === 0;
+                    if (isEmptyProxy) {
+                        if (proxyType !== proxies_1.Proxies.NO_PROXY) {
+                            console.log("KILLING APPLICATION DUE TO INVALID PROXY");
+                            process.exit(10);
+                        }
+                        return [2 /*return*/, null];
+                    }
+                    return [2 /*return*/, proxy];
+            }
+        });
+    });
+}

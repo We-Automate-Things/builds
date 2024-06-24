@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,45 +54,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthHelper = void 0;
+exports.ProxyService = void 0;
 var axios_1 = __importDefault(require("axios"));
-var encryption_helper_1 = require("./encryption-helper");
-var AuthHelper = /** @class */ (function () {
-    function AuthHelper() {
-        this.encryptor = new encryption_helper_1.EncryptionHelper();
-        this.encryptor.generateIVString();
-        this.serverKey = this.encryptor.encryptValue(process.env.SERVER_KEY);
+var api_base_1 = require("../helpers/api-base");
+var ProxyService = /** @class */ (function (_super) {
+    __extends(ProxyService, _super);
+    function ProxyService(authKey) {
+        var baseUrl = process.env.BASE_URL;
+        return _super.call(this, baseUrl, authKey) || this;
     }
-    AuthHelper.prototype.getAuthKey = function (modelId, chatsiteId) {
+    ProxyService.prototype.getBaseUrl = function () {
+        return "".concat(this.baseUrl, "/scraper");
+    };
+    ProxyService.prototype.fetchProxy = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var httpOptions, json, URL, response, base64Token, token;
+            var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        httpOptions = {
-                            headers: {
-                                "scraper-identification": "".concat(this.serverKey),
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        json = {
-                            "model_id": modelId,
-                            "chatsite_id": chatsiteId
-                        };
-                        URL = "".concat(process.env.BASE_URL, "/initiate-scraper");
-                        return [4 /*yield*/, axios_1.default.post(URL, json, httpOptions)];
+                    case 0: return [4 /*yield*/, axios_1.default.post("".concat(this.getBaseUrl(), "/available-proxy"), {}, this.httpOptions)];
                     case 1:
                         response = _a.sent();
-                        if (response.status === 404) {
-                            process.exit(10);
-                        }
-                        base64Token = response.data.token;
-                        token = Buffer.from(base64Token, "base64").toString();
-                        return [2 /*return*/, [this.encryptor.decryptValue(token), response.data.proxy_type]];
+                        return [2 /*return*/, response.data];
                 }
             });
         });
     };
-    return AuthHelper;
-}());
-exports.AuthHelper = AuthHelper;
+    return ProxyService;
+}(api_base_1.ApiBase));
+exports.ProxyService = ProxyService;

@@ -57,8 +57,8 @@ var tasks_1 = require("../enums/tasks");
 var states_1 = require("../enums/states");
 var FancentroScraper = /** @class */ (function (_super) {
     __extends(FancentroScraper, _super);
-    function FancentroScraper(browserAgent, modelCredential, privateKey, modelId, chatsiteName) {
-        var _this = _super.call(this, browserAgent, modelCredential, privateKey, modelId, chatsiteName) || this;
+    function FancentroScraper(proxy, browserAgent, modelCredential, privateKey, modelId, chatsiteName) {
+        var _this = _super.call(this, proxy, browserAgent, modelCredential, privateKey, modelId, chatsiteName) || this;
         _this.consoleLog("INITIATING FANCETRO");
         return _this;
     }

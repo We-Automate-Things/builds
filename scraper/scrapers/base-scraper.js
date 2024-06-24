@@ -82,8 +82,9 @@ var tasks_1 = require("../enums/tasks");
 var sales_service_1 = require("../services/sales-service");
 var states_1 = require("../enums/states");
 var baseScraper = /** @class */ (function () {
-    function baseScraper(browserAgent, modelCredential, privateKey, modelId, chatsiteId) {
+    function baseScraper(proxy, browserAgent, modelCredential, privateKey, modelId, chatsiteId) {
         this.previousSalesCount = 0;
+        this.proxy = proxy;
         this.chromium = browserAgent;
         this.modelCredentials = modelCredential;
         this.privateKey = privateKey;
@@ -97,11 +98,27 @@ var baseScraper = /** @class */ (function () {
     }
     baseScraper.prototype.initiateScraperFlow = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var productionMode;
+            var productionMode, launchOptions;
             var _this = this;
             return __generator(this, function (_a) {
                 productionMode = (String(process.env.PRODUCTION_MODE).toLowerCase() === "true");
-                this.chromium.launch({ headless: productionMode }).then(function (browser) { return __awaiter(_this, void 0, void 0, function () {
+                launchOptions = null;
+                if (this.proxy != null) {
+                    launchOptions = {
+                        proxy: {
+                            server: "".concat(this.proxy.ip, ":").concat(this.proxy.sock_five),
+                            username: this.proxy.username,
+                            password: this.proxy.password,
+                        },
+                        headless: productionMode
+                    };
+                }
+                else {
+                    launchOptions = {
+                        headless: productionMode
+                    };
+                }
+                this.chromium.launch(launchOptions).then(function (browser) { return __awaiter(_this, void 0, void 0, function () {
                     var _a, _b;
                     return __generator(this, function (_c) {
                         switch (_c.label) {
