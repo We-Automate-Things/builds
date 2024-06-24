@@ -5,7 +5,6 @@
     "coming_soon": "जल्द आ रहा है",
     "error": "त्रुटि",
     "submit": "जमा करें",
-    "delete": "हटाएं",
 
     "_LOGIN SECTION": "",
     "login": "लॉग इन",
@@ -146,22 +145,6 @@
     "recent_orders_status": "स्थिति",
     "recent_orders_date": "तारीख",
 
-    "_PROXY_MANAGEMENT": "",
-    "proxy_management_title": "प्रॉक्सी प्रबंधन",
-    "ip_address": "आईपी पता",
-    "proxy_type": "प्रकार",
-    "active_state": "स्थिति",
-    "add_proxies": "प्रॉक्सी जोड़ें",
-    "delete_selected_proxies": "प्रॉक्सी हटाएं",
-    "extend_validation_title": "मान्यता अवधि बढ़ाएं",
-    "add_proxies_title": "प्रॉक्सी जोड़ें",
-    "open_this_select_menu": "प्रकार चुनें",
-    "upload_file_title": "फ़ाइल अपलोड करें",
-    "upload_hints": "खींचें और छोड़ें",
-    "extend_proxies_title": "प्रॉक्सी का विस्तार करें",
-    "new_valid_until": "नया मान्यताफल समाप्ति दिनांक दर्ज करें।",
-    "pagination_info": "{0} से {1} तक {2} प्रविष्टियाँ दिखा रहा है",
-
     "_PAYOUTS": "",
     "payout_title": "भुगतान",
     "payout_start_date": "भुगतान प्रारंभ तिथि",
@@ -199,6 +182,5 @@
     "_CHAT INSIGHTS MODAL": "",
     "insights_title": "जानकारियां",
     "notes_title": "नोट्स",
-    "add_note_button": "नोट जोड़ें",
-    "cancel_button": "रद्द करें"
+    "add_note_button": "नोट जोड़ें"
 }

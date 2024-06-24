@@ -5,7 +5,6 @@
     "coming_soon": "Σύντομα Διαθέσιμο",
     "error": "Σφάλμα",
     "submit": "υποβάλλω",
-    "delete": "Διαγραφή",
 
     "_LOGIN SECTION": "",
     "login": "Είσοδος",
@@ -147,22 +146,6 @@
     "recent_orders_status": "Κατάσταση",
     "recent_orders_date": "Ημερομηνία",
 
-    "_PROXY_MANAGEMENT": "",
-    "proxy_management_title": "Διαχείριση Πληρεξουσίων",
-    "ip_address": "Διεύθυνση IP",
-    "proxy_type": "Τύπος",
-    "active_state": "Κατάσταση",
-    "add_proxies": "Προσθήκη πληρεξουσίων",
-    "delete_selected_proxies": "Διαγραφή πληρεξουσίων",
-    "extend_validation_title": "Παράταση περιόδου ισχύος",
-    "add_proxies_title": "Προσθήκη πληρεξουσίων",
-    "open_this_select_menu": "Επιλέξτε τύπο",
-    "upload_file_title": "Ανέβασμα αρχείου",
-    "upload_hints": "σύρετε και αποθέστε",
-    "extend_proxies_title": "Παράταση πληρεξουσίων",
-    "new_valid_until": "Εισαγάγετε νέα ημερομηνία λήξης ισχύος.",
-    "pagination_info": "Εμφάνιση {0} έως {1} από {2} καταχωρήσεις",
-
     "_PAYOUTS": "",
     "payout_title": "Πληρωμές",
     "payout_start_date": "Ημερομηνία Έναρξης Πληρωμής",
@@ -201,5 +184,6 @@
     "insights_title": "Ενημερώσεις",
     "notes_title": "Σημειώσεις",
     "add_note_button": "Προσθήκη σημείωσης",
-    "cancel_button": "Ακύρωση"
+    "cancel_button": "Ακύρωση",
+    "cancel_button": "रद्द करें"
 }

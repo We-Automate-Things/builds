@@ -5,7 +5,6 @@
     "coming_soon": "Coming Soon",
     "error": "Error",
     "submit": "Submit",
-    "delete": "Delete",
 
     "_LOGIN SECTION": "",
     "login": "Login",
@@ -152,44 +151,7 @@
     "recent_orders_status": "Status",
     "recent_orders_date": "Date",
 
-    "_PROXY_MANAGEMENT": "",
-    "proxy_management_title": "Proxy Management",
-    "ip_address": "IP address",
-    "proxy_type": "Type",
-    "active_state": "State",
-    "add_proxies": "Add proxies",
-    "delete_selected_proxies": "Delete proxies",
-    "extend_validation_title": "Extend validation term",
-    "add_proxies_title": "Add proxies",
-    "open_this_select_menu": "Choose type",
-    "upload_file_title": "Upload file",
-    "upload_hints": "drag and drop",
-    "extend_proxies_title": "Extend proxies",
-    "new_valid_until": "Enter new end of validity date.",
-    "pagination_info": "Showing {0} to {1} of {2} entries",
-    "delete_proxy_row_title": "Are you sure?",
-    "delete_proxy_row_text": "This proxy will be deleted.",
-    "delete_proxy_row_confirm": "Delete",
-    "delete_proxy_row_confirm_title": "Deleted!",
-    "delete_proxy_row_confirm_text": "The selected proxy has been deleted.",
-    "bulk_delete_proxies_err_toast_title": "Active proxies detected",
-    "bulk_delete_proxies_err_toast_message": "You have selected ${this.activeCount} active proxies, make sure to deactivate them first or uncheck those",
-    "bulk_delete_proxies_title": "Are you sure?",
-    "bulk_delete_proxies_text": "There are ${this.selectedArray.length} proxies being deleted if you click on confirm",
-    "bulk_delete_proxies_confirm": "Delete",
-    "bulk_delete_proxies_confirm_title": "Deleted!",
-    "bulk_delete_proxies_confirm_text": "${this.selectedArray.length} proxies have been deleted.",
-    "toggle_activate_proxy_row_title": "Are you sure?",
-    "toggle_activate_proxy_row_text": "The state of this proxy will be changed.",
-    "toggle_activate_proxy_row_confirm": "Change",
-    "toggle_activate_proxy_row_confirm_title": "Changed!",
-    "toggle_activate_proxy_row_confirm_text": "Proxy state has been changed.",
-    "bulk_activate_toggle_proxies_title": "Are you sure?",
-    "bulk_activate_toggle_proxies_text": "The state of the proxies will be changed.",
-    "bulk_activate_toggle_proxies_confirm": "Change",
-    "bulk_activate_toggle_proxies_confirm_title": "Changed!",
-    "bulk_activate_toggle_proxies_confirm_text": "The state of the selected proxies have been changed",
-    "": "",
+
 
 
     "_PAYOUTS": "",
@@ -200,6 +162,8 @@
     "payout_weekly_text": "Weekly",
     "payout_biweekly_text": "Bi_Weekly",
     "payout_monthly_text": "Monthly",
+
+
 
     "_HEADER PROFILE POPUP": "",
     "profile": "Profile",
@@ -229,6 +193,6 @@
     "_CHAT INSIGHTS MODAL": "",
     "insights_title": "Insights",
     "notes_title": "Notes",
-    "add_note_button": "Add note",
-    "cancel_button": "Cancel"
+    "add_note_button": "Add note"
+
 }
