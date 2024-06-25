@@ -106,7 +106,7 @@ var baseScraper = /** @class */ (function () {
                 if (this.proxy != null) {
                     launchOptions = {
                         proxy: {
-                            server: "".concat(this.proxy.ip, ":").concat(this.proxy.sock_five),
+                            server: "".concat(this.proxy.ip, ":").concat(this.proxy.https),
                             username: this.proxy.username,
                             password: this.proxy.password,
                         },
