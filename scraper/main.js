@@ -55,6 +55,7 @@ var auth_helper_1 = require("./helpers/auth-helper");
 var model_credential_service_1 = require("./services/model-credential-service");
 var proxy_service_1 = require("./services/proxy-service");
 var proxies_1 = require("./enums/proxies");
+var encryption_helper_1 = require("./helpers/encryption-helper");
 console.log("INITIATE SCRAPER");
 dotenv_1.default.config({ path: "".concat(__dirname, "/.env") });
 var modelId = null;
@@ -141,7 +142,7 @@ playwright_extra_1.chromium.use((0, puppeteer_extra_plugin_stealth_1.default)())
 }); })();
 function proxyValidation(privateKey, proxyType) {
     return __awaiter(this, void 0, void 0, function () {
-        var proxyService, proxy, isEmptyProxy;
+        var proxyService, proxy, isEmptyProxy, encryptionHelper, password;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -157,6 +158,9 @@ function proxyValidation(privateKey, proxyType) {
                         }
                         return [2 /*return*/, null];
                     }
+                    encryptionHelper = new encryption_helper_1.EncryptionHelper();
+                    password = Buffer.from(proxy.password, "base64").toString();
+                    proxy.password = encryptionHelper.decryptValue(password);
                     return [2 /*return*/, proxy];
             }
         });
