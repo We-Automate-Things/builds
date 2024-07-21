@@ -50,6 +50,7 @@
     "chat": "Chat",
     "user_management": "User Management",
     "finance": "Finance",
+    "snipe": "Snipe View",
 
     "_TOASTS MESSAGES": "",
     "oops": "Oops...",
@@ -160,6 +161,7 @@
     "add_proxies": "Add proxies",
     "delete_selected_proxies": "Delete proxies",
     "extend_validation_title": "Extend validation term",
+    "change_proxies_state": "Change state",
     "add_proxies_title": "Add proxies",
     "open_this_select_menu": "Choose type",
     "upload_file_title": "Upload file",
@@ -215,6 +217,10 @@
     "_MODALS": "",
     "_CONTENT MODAL": "",
     "select_content": "Select content",
+    "sales_count": "Sold",
+    "confirmed_sales": "Confirmed Sales",
+    "unconfirmed_sales": "Unconfirmed Sales",
+    "no_sales": "No sales",
     "price": "Price",
     "add_content": "Add content",
 
